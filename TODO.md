@@ -8,10 +8,10 @@
 
 For this lab work 4 classical ciphers have to be implemented:
 
-- [ ] Caesar cipher substitution
-- [ ] Caesar cipher substitution + alphabet permutation
-- [ ] Vigenere cipher
-- [ ] Playfair cipher
+- [x] Caesar cipher substitution
+- [x] Caesar cipher substitution + alphabet permutation
+- [x] Vigenere cipher
+- [x] Atbash cipher
 
 ---
 
