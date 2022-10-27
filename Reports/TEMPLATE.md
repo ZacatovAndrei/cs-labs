@@ -2,7 +2,7 @@
 
 ## Course: Cryptography & Security
 
-## Author: Name Surname
+## Author: Zacatov Andrei
 
 ----
 

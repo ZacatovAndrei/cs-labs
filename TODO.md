@@ -23,10 +23,10 @@ For this lab work 4 classical ciphers have to be implemented:
 
 For this lab work an example should be implemented for both a stream cipher and a block cipher.
 
-- [ ] Stream cipher : SEAL
+- [x] Stream cipher : RC4
  <!--
-    -[ ] apparently requires SHA-1 as part of key generation
-    Fixed by using the openssl's libcrypto (maybe)
+    -[ ] apparently SEAL required SHA-1 as part of key generation
+    Revering to the RC4 cipher
    -->
 - [ ] Block Cipher : AES
 
