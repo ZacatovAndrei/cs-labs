@@ -12,6 +12,7 @@ ciphersImplemented.Add(new Ciphers.Classical.Atbash());
 ciphersImplemented.Add(new Ciphers.Classical.Caesar("2"));
 ciphersImplemented.Add(new Ciphers.Classical.CaesarP("5", "This is a test"));
 ciphersImplemented.Add(new Ciphers.Classical.Vigenere("Attack"));
+ciphersImplemented.Add(new Ciphers.Modern.RC4("Some random key of a decent length"));
 
 string stringToEncode = "This is a simple test of the cipher. Capitalisation will be lost in the process of encoding and decoding";
 string encodedString = "";
