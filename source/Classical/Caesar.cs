@@ -30,7 +30,7 @@ namespace Ciphers
                         continue;
                     }
                     var pos = Array.IndexOf(_alphabet, character);
-                    cipherText.Append(_alphabet[(pos - shift + _alphabet.Length) % _alphabet.Length]); ;
+                    cipherText.Append(_alphabet[(pos + shift + _alphabet.Length) % _alphabet.Length]); ;
                 }
                 return cipherText.ToString();
             }

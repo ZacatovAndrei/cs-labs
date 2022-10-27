@@ -24,7 +24,6 @@ namespace Ciphers
                 {
                     if (checkedLetters.Remove(character)) newalphabet.Append(character);
                 }
-                Console.Write(newalphabet.ToString());
 
                 foreach (var character in checkedLetters)
                 {

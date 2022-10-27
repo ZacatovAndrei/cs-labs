@@ -9,7 +9,7 @@ Console.WriteLine("CS lab work ciphers implemented:\nCaesar's cipher\tCaesar wit
 //Here come the tests for each cipher implemented:
 List<Cipher> ciphersImplemented = new List<Cipher>();
 ciphersImplemented.Add(new Ciphers.Classical.Atbash());
-ciphersImplemented.Add(new Ciphers.Classical.Caesar("13"));
+ciphersImplemented.Add(new Ciphers.Classical.Caesar("2"));
 ciphersImplemented.Add(new Ciphers.Classical.CaesarP("5", "This is a test"));
 ciphersImplemented.Add(new Ciphers.Classical.Vigenere("Attack"));
 
