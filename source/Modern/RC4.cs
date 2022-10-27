@@ -7,8 +7,8 @@ namespace Ciphers
         public class RC4 : Cipher
         {
             private byte[] _S;
-            private byte _i = 0;
-            private byte _j = 0;
+            private byte _i;
+            private byte _j;
 
             public RC4(string key)
             {
@@ -51,8 +51,6 @@ namespace Ciphers
                 {
                     cipherBytes[i] = (byte)((keyBytes[i] ^ msgBytes[i]) % 256);
                 }
-
-
                 return BitConverter.ToString(cipherBytes);
             }
 

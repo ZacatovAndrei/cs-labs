@@ -28,7 +28,7 @@ For this lab work an example should be implemented for both a stream cipher and 
     -[ ] apparently SEAL required SHA-1 as part of key generation
     Revering to the RC4 cipher
    -->
-- [ ] Block Cipher : AES
+- [ ] Block Cipher : DES
 
 ### Lab work №3. Asymmetric ciphers
 
