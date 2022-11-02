@@ -34,4 +34,4 @@ For this lab work an example should be implemented for both a stream cipher and 
 
 For this lab work an assymetric cipher has to be implemented
 
-- [ ] Assyumetric cipher RSA
+- [ ] Assymetric cipher RSA
