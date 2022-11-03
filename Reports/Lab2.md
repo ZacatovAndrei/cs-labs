@@ -20,7 +20,7 @@ Block Ciphers, on the other hand, operate on larger blocks of data and rely not 
 
 ### Implementation description
 
-Both `BLowfish` and `RC4` are classes inheriting from the base class `Cipher`. The difference in structure is prominent enough to not group them under a common `ModernCipher` abstraction, and the number of ciphers to implement doesn't call for separate abstractions, such as a `StringCipher`, as well as block ciphes being different enough between themselves that the hierarchy will be unneedingly complex.
+Both `RC5` and `RC4` are classes inheriting from the base class `Cipher`. The difference in structure is prominent enough to not group them under a common `ModernCipher` abstraction, and the number of ciphers to implement doesn't call for separate abstractions, such as a `StringCipher` and/or `BlockCipher`.
 
 #### **Implementation proper**
 
@@ -129,9 +129,111 @@ public override string Decode(string cipher)
             }
 ```
 
-2. Blowfish  **\<Still in progress>**
+2. RC5
+ RC5 is one of the easier block ciphers to implement both in software and hardware, however it is still sufficiently secure if provided enough rounds. Here are the main functions implemented for this cipher:
 
-Function that decodes the hex-string back into regular text. The generator is reset to the initial state so that correct key is generated. Strings get separated into N pairs of hex literals, forming one byte each. N bytes of cipher stream are generated and XOR-ed with  the ciphertext. bytes are cast into char types and outputted back as a string.
+```c#
+private void setup(byte[] K, int b)
+            {
+                // magic constants
+
+                UInt64 Pw = 0xB7E151628AED2A6B;
+                UInt64 Qw = 0x9E3779B97F4A7C15;
+                //things that don't unnecessary have to be uint64
+                int u = _w / 8;
+                int t = 2 * (_r + 1);
+                int c = Math.Max(1, (int)Math.Ceiling(8 * (double)(b / u)));
+                int i, j, k;
+
+                //Things that have to be UInt64
+                UInt64 A, B;
+                UInt64[] L = new UInt64[c];
+
+                // Key scheduling
+                for (i = b - 1, L[c - 1] = 0; i != -1; i--)
+                {
+                    L[i / u] = (L[i / u] << 8) + K[i];
+                }
+
+                for (_S[0] = Pw, i = 1; i < t; i++)
+                {
+                    _S[i] = _S[i - 1] + Qw;
+                }
+
+                for (A = B = 0, i = j = k = 0; k < 3 * t; k++, i = (i + 1) % t, j = (j + 1) % c)
+                {
+                    A = _S[i] = BitOperations.RotateLeft(_S[i] + (A + B), 3);
+                    B = L[j] = BitOperations.RotateLeft(L[j] + (A + B), (int)((A + B) % 64));
+                }
+```
+
+The key scheduling function consists of generating a pseudortandom array S, which is private to the class, and, at first, initialised with the use of 2 Magic numbers P and Q  based on the golden ratio and the number e as the "nothing-up-my-sleeve" numbers. Then with the provided formulas and circular shifting the key is generated based on the secret key provided.
+
+```c#
+private byte[] encodeBlock(byte[] block)
+            {
+                UInt64 A = BitConverter.ToUInt64(block, 0) + _S[0];
+                UInt64 B = BitConverter.ToUInt64(block, 8) + _S[1];
+                byte[] Result = new byte[16];
+                for (int i = 1; i <= _r; i++)
+                {
+                    A = BitOperations.RotateLeft(A ^ B,/*!!*/ (int)(B % 64)) + _S[2 * i];
+                    B = BitOperations.RotateLeft(B ^ A,/*!!*/ (int)(A % 64)) + _S[2 * i + 1];
+                }
+                BitConverter.GetBytes(A).CopyTo(Result, 0);
+                BitConverter.GetBytes(B).CopyTo(Result, 8);
+                return Result;
+            }
+```
+
+The encoding function looks the following way. A block here is considered to be twice the length of the word size chosen (64 in this case). The bytes are XORed and shifted accoring to the formulas for as many rounds (_r) as chosen (12 in this case).  
+For the sake of simplicity when using bit shifts the byte array has been broken up into 2 words and then back to byte arrays.  
+The modular operations and casting in the evidentiated areas (/*!!*/) are needed due to the method signature being `BinOperations.RotateLeft(UInt64,int)`
+The Decode() method is nothing more than the reverse of the Encode() method, hence only one is provided
+
+```c#
+public override string Encode(string plain)
+            {
+                //adjusting the length of the ciphertext
+                var bs = 16;
+                if (plain.Length % bs != 0)
+                {
+                    var add = (bs - plain.Length % bs);
+                    plain += new String('\0', add);
+                }
+                // Ecnoding the blocks
+                var byteString = Encoding.ASCII.GetBytes(plain);
+                var encodedString = new byte[byteString.Length];
+                var strlen = byteString.Length;
+                for (int i = 0; i < strlen; i += bs)
+                {
+
+                    encodeBlock(byteString[i..(i + bs)]).CopyTo(encodedString, i);
+                }
+                return Convert.ToHexString(encodedString);
+            }
+
+            public override string Decode(string cipher)
+            {
+                //getting bytes from the string
+                var bytes = Convert.FromHexString(cipher);
+                var strlen = bytes.Length;
+                var bs = 16;
+                var decodedString = new byte[strlen];
+                for (int i = 0; i < strlen; i += bs)
+                {
+
+                    decodeBlock(bytes[i..(i + bs)]).CopyTo(decodedString, i);
+                }
+                var cleaning = Array.IndexOf<byte>(decodedString, 0);
+                Array.Resize<byte>(ref decodedString, cleaning);
+                return Encoding.ASCII.GetString(decodedString);
+            }
+
+```
+
+Encoding and Decoding functions are quite simple. In the encoding function the message is divided into individual bytes, padded with zeroes accodrdingly to the blocksize and then each block is enctypted individually.
+In the decoding function the hexString is decoded back into the sequence of bytes, then divided in blocks, each block is decoded and then the padding zeroes are removed.
 
 ### Conclusions / Screenshots / Results
 

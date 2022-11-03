@@ -1,5 +1,7 @@
 # TODO for CS Lab works
 
+## !REFACTOR AS MUCH AS POSSIBLE
+
 ## Part 1. Calssical ciphers
 
 ---
@@ -28,10 +30,14 @@ For this lab work an example should be implemented for both a stream cipher and 
     -[ ] apparently SEAL required SHA-1 as part of key generation
     Revering to the RC4 cipher
    -->
-- [ ] Block Cipher : RC5
+- [x] Block Cipher : RC5
 
 ### Lab work №3. Asymmetric ciphers
 
 For this lab work an assymetric cipher has to be implemented
 
-- [ ] Assymetric cipher RSA
+- [ ] Assymetric cipher : RSA
+
+### Lab work №4. Hash functions and digital signatures
+
+- [ ] Hash function : SHA-1
