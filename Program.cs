@@ -8,12 +8,12 @@ Console.WriteLine("CS lab work ciphers implemented:\nCaesar's cipher\tCaesar wit
 
 //Here come the tests for each cipher implemented:
 List<Cipher> ciphersImplemented = new List<Cipher>();
-ciphersImplemented.Add(new Ciphers.Classical.Atbash());
-ciphersImplemented.Add(new Ciphers.Classical.Caesar("2"));
-ciphersImplemented.Add(new Ciphers.Classical.CaesarP("5", "This is a test"));
-ciphersImplemented.Add(new Ciphers.Classical.Vigenere("Attack"));
-ciphersImplemented.Add(new Ciphers.Modern.RC4("Some random key of a decent length"));
-ciphersImplemented.Add(new Ciphers.Modern.RC5("hello there i hate it here"));
+ciphersImplemented.Add(new Ciphers.Atbash());
+ciphersImplemented.Add(new Ciphers.Caesar("2"));
+ciphersImplemented.Add(new Ciphers.CaesarP("5", "This is a test"));
+ciphersImplemented.Add(new Ciphers.Vigenere("Attack"));
+ciphersImplemented.Add(new Ciphers.RC4("Some random key of a decent length"));
+ciphersImplemented.Add(new Ciphers.RC5("hello there i hate it here"));
 
 string stringToEncode = "This is a simple test of the cipher. Capitalisation will be lost in the process of encoding and decoding";
 string encodedString = "";
