@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Collections;
 using Ciphers;
-
+using Hash;
 Console.WriteLine("Made by Zacatov Andrei");
 Console.WriteLine("CS lab work ciphers implemented:\nCaesar's cipher\tCaesar with permutations\nVigenere\t Atbash");
 //TODO: add a name field to every class to allow for choosing a ciphers;
@@ -15,7 +15,15 @@ ciphersImplemented.Add(new Ciphers.Vigenere("Attack"));
 ciphersImplemented.Add(new Ciphers.RC4("Some random key of a decent length"));
 ciphersImplemented.Add(new Ciphers.RC5("hello there i hate it here"));
 
-string stringToEncode = "This is a simple test of the cipher. Capitalisation will be lost in the process of encoding and decoding";
+Console.WriteLine($"{BitConverter.IsLittleEndian}");
+
+Hash.SHA1 oof = new SHA1();
+
+oof.processBlock(oof.preprocessMessage("abc"));
+
+
+
+string stringToEncode = "Hello there";
 string encodedString = "";
 
 foreach (Cipher cipher in ciphersImplemented)

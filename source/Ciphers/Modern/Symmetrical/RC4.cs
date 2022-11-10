@@ -37,33 +37,24 @@ namespace Ciphers
         public override string Encode(string plain)
         {
             int len = plain.Length;
-            byte[] msgBytes = new byte[len];
+            byte[] msgBytes = Encoding.ASCII.GetBytes(plain);
             byte[] keyBytes = getKeyStreamBytes(len);
             byte[] cipherBytes = new byte[len];
             for (int i = 0; i < len; i++)
             {
-                msgBytes[i] = ((byte)plain[i]);
-            }
-
-            for (int i = 0; i < len; i++)
-            {
                 cipherBytes[i] = (byte)((keyBytes[i] ^ msgBytes[i]) % 256);
             }
-            return BitConverter.ToString(cipherBytes);
+            return Convert.ToHexString(cipherBytes);
         }
 
         public override string Decode(string cipher)
         {
             //reinitialise the PRNG
             initialise();
-            List<byte> msgBytes = new List<byte>();
+            byte[] msgBytes = Convert.FromHexString(cipher);
             StringBuilder res = new StringBuilder();
-            foreach (var hex in cipher.Split("-"))
-            {
-                msgBytes.Add(byte.Parse(hex, System.Globalization.NumberStyles.HexNumber));
-            }
-            byte[] keyBytes = getKeyStreamBytes(msgBytes.Count);
-            for (int i = 0; i < msgBytes.Count; i++)
+            byte[] keyBytes = getKeyStreamBytes(msgBytes.Length);
+            for (int i = 0; i < msgBytes.Length; i++)
             {
                 res.Append((char)(msgBytes[i] ^ keyBytes[i]));
             }
