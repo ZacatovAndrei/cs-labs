@@ -6,6 +6,7 @@ namespace Ciphers
     class RC5 : Cipher
     {
         private int _w = 64;
+        private int _blocksize;
         private int _r;
         private UInt64[] _S;
 
@@ -13,6 +14,7 @@ namespace Ciphers
         {
             _key = key;
             _r = rounds;
+            _blocksize = _w / 16;
             _S = new UInt64[2 * (rounds + 1)];
             setup(Encoding.ASCII.GetBytes(_key), _key.Length);
             Console.WriteLine("henlo, cipher initialised");
@@ -88,20 +90,19 @@ namespace Ciphers
         public override string Encode(string plain)
         {
             //adjusting the length of the ciphertext
-            var bs = 16;
-            if (plain.Length % bs != 0)
+            if (plain.Length % _blocksize != 0)
             {
-                var add = (bs - plain.Length % bs);
+                var add = (_blocksize - plain.Length % _blocksize);
                 plain += new String('\0', add);
             }
             // Ecnoding the blocks
             var byteString = Encoding.ASCII.GetBytes(plain);
             var encodedString = new byte[byteString.Length];
             var strlen = byteString.Length;
-            for (int i = 0; i < strlen; i += bs)
+            for (int i = 0; i < strlen; i += _blocksize)
             {
 
-                encodeBlock(byteString[i..(i + bs)]).CopyTo(encodedString, i);
+                encodeBlock(byteString[i..(i + _blocksize)]).CopyTo(encodedString, i);
             }
             return Convert.ToHexString(encodedString);
         }
@@ -111,12 +112,11 @@ namespace Ciphers
             //getting bytes from the string
             var bytes = Convert.FromHexString(cipher);
             var strlen = bytes.Length;
-            var bs = 16;
             var decodedString = new byte[strlen];
-            for (int i = 0; i < strlen; i += bs)
+            for (int i = 0; i < strlen; i += _blocksize)
             {
 
-                decodeBlock(bytes[i..(i + bs)]).CopyTo(decodedString, i);
+                decodeBlock(bytes[i..(i + _blocksize)]).CopyTo(decodedString, i);
             }
             var cleaning = Array.IndexOf<byte>(decodedString, 0);
             Array.Resize<byte>(ref decodedString, cleaning);

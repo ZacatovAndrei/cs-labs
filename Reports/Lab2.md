@@ -20,114 +20,97 @@ Block Ciphers, on the other hand, operate on larger blocks of data and rely not 
 
 ### Implementation description
 
-Both `RC5` and `RC4` are classes inheriting from the base class `Cipher`. The difference in structure is prominent enough to not group them under a common `ModernCipher` abstraction, and the number of ciphers to implement doesn't call for separate abstractions, such as a `StringCipher` and/or `BlockCipher`.
+Both `RC5` and `RC4` are classes inheriting from the base class `Cipher`. The difference in structure is prominent enough to not group them under a common `ModernCipher` abstraction, and the number of ciphers to implement doesn't call for separate abstractions, such as a `StringCipher` and/or `BlockCipher`. Further namespace separation will be used.
 
-#### **Implementation proper**
+#### Implementation details
 
 1. RC4
 
-```c#
- private void initialise()
-            {
-                _i = _j = 0;
-                List<byte> byteKey = new List<byte>();
-
-                //converting a string into a byte stream
-                foreach (char symb in _key)
+    ```c#
+    private void initialise()
                 {
-                    byteKey.Add((byte)symb);
+                    _i = _j = 0;
+                    //converting a string into a byte stream
+                    foreach (char symb in _key)
+                    {
+                        byteKey.Add((byte)symb);
+                    }
+                    keylen = byteKey.Count;
+                    //initialising the identity permutation
+                    for (int i = 0; i < 256; i++)
+                    {
+                        _S[i] = (byte)i;
+                    }
+                    //initialising the permutation
+                    byte j = 0;
+                    for (int i = 0; i < 256; i++)
+                    {
+                        j = (byte)(((j + _S[i] + _key[i % len])) % 256);
+
+                        //swapping the values
+                        //TODO: refactor into a method
+                        var temp = _S[i];
+                        _S[i] = _S[j];
+                        _S[j] = temp;
+
+                    }
                 }
 
-                var len = byteKey.Count;
-                //initialising the identity permutation
-                for (int i = 0; i < 256; i++)
-                {
-                    _S[i] = (byte)i;
-                }
-                //initialising the permutation
-                byte j = 0;
-                for (int i = 0; i < 256; i++)
-                {
-                    j = (byte)(((j + _S[i] + _key[i % len])) % 256);
+    ```
 
-                    //swapping the values
-                    //TODO: refactor into a method
-                    var temp = _S[i];
-                    _S[i] = _S[j];
-                    _S[j] = temp;
+    The key-scheduling algorithm of the RC4 cipher, as seen in [here](https://en.wikipedia.org/wiki/RC4#Key-scheduling_algorithm_(KSA))
 
-                }
-            }
+    ```c#
+    private byte[] getKeyStreamBytes(int n)
+    {
+        for (var k = 0; k < n; k++)
+        {
+            _i = (byte)((_i + 1) % 256);
+            _j = (byte)((_j + _S[_i]) % 256);
+            
+            swap(_S[_i],_S[j]);
+            index = (byte)((_S[_i] + _S[_j]) % 256);
+            result[k] = _S[index];
+        }
+    return result;
+    }
+    ```
 
-```
+    function for generating the cipherstream as seen [here](https://en.wikipedia.org/wiki/RC4#Pseudo-random_generation_algorithm_(PRGA))
 
-The key-scheduling algorithm of the RC4 cipher, as seen in [here](https://en.wikipedia.org/wiki/RC4#Key-scheduling_algorithm_(KSA))
+    ```c#
+    public override string Encode(string plain)
+    {
+        byte[] msgBytes = Encoding.ASCII.GetBytes(plain);
+        byte[] keyBytes = getKeyStreamBytes(len);
 
-```c#
-private byte[] getKeyStreamBytes(int n)
-            {
-                byte[] result = new byte[n];
-                byte index = 0;
-                for (var k = 0; k < n; k++)
-                {
-                    _i = (byte)((_i + 1) % 256);
-                    _j = (byte)((_j + _S[_i]) % 256);
+        for (int i = 0; i < msgBytes.Length; i++)
+        {
+            cipherBytes[i] = (byte)((keyBytes[i] ^ msgBytes[i]) % 256);
+        }
+        
+        return Convert.ToHexString(cipherBytes);
+    }
 
-                    var temp = _S[_i];
-                    _S[_i] = _S[_j];
-                    _S[_j] = temp;
+    ```
 
-                    index = (byte)((_S[_i] + _S[_j]) % 256);
-                    result[k] = _S[index];
-                }
-                return result;
-            }
-```
+    function for encoding the palintext. String is transformed into a sequence of bytes of length N, then N bits of keystream are generated, the two byte arrays are XOR-ed together and the result is outputted as a string of hex values.
 
-function for generating the cipherstream as seen [here](https://en.wikipedia.org/wiki/RC4#Pseudo-random_generation_algorithm_(PRGA))
+    ```c#
+    public override string Decode(string cipher)
+    {
+        //reinitialise the PRNG
+        initialise();
+        byte[] msgBytes = Convert.FromHexString(cipher);
+        byte[] keyBytes = getKeyStreamBytes(msgBytes.Length);
 
-```c#
-public override string Encode(string plain)
-            {
-                int len = plain.Length;
-                byte[] msgBytes = new byte[len];
-                byte[] keyBytes = getKeyStreamBytes(len);
-                byte[] cipherBytes = new byte[len];
-                for (int i = 0; i < len; i++)
-                {
-                    msgBytes[i] = ((byte)plain[i]);
-                }
-
-                for (int i = 0; i < len; i++)
-                {
-                    cipherBytes[i] = (byte)((keyBytes[i] ^ msgBytes[i]) % 256);
-                }
-                return BitConverter.ToString(cipherBytes);
-            }
-
-```
-
-function for encoding the palintext. String is transformed into a sequence of bytes of length N, then N bits of keystream are generated, the two byte arrays are XOR-ed together and the result is outputted as a string of hex values.
-
-```c#
-public override string Decode(string cipher)
-            {
-                //reinitialise the PRNG
-                initialise();
-                List<byte> msgBytes = new List<byte>();
-                StringBuilder res = new StringBuilder();
-                foreach (var hex in cipher.Split("-"))
-                {
-                    msgBytes.Add(byte.Parse(hex, System.Globalization.NumberStyles.HexNumber));
-                }
-                byte[] keyBytes = getKeyStreamBytes(msgBytes.Count);
-                for (int i = 0; i < msgBytes.Count; i++)
-                {
-                    res.Append((char)(msgBytes[i] ^ keyBytes[i]));
-                }
-                return res.ToString();
-            }
-```
+        for (int i = 0; i < msgBytes.Length; i++)
+        {
+            res.Append((char)(msgBytes[i] ^ keyBytes[i]));
+        }
+    return res.ToString();
+    }
+    ```
 
 2. RC5
  RC5 is one of the easier block ciphers to implement both in software and hardware, however it is still sufficiently secure if provided enough rounds. Here are the main functions implemented for this cipher:
@@ -136,18 +119,19 @@ public override string Decode(string cipher)
 private void setup(byte[] K, int b)
             {
                 // magic constants
-
                 UInt64 Pw = 0xB7E151628AED2A6B;
                 UInt64 Qw = 0x9E3779B97F4A7C15;
-                //things that don't unnecessary have to be uint64
-                int u = _w / 8;
+                /* 
+                w - word size in bytes
+                _r - the number of rounds
+                c - length of key in bytes
+                A B are left and right parts of keystream (simulated)
+                L is a temporary array 
+                */
+                int u = _w / 8; 
                 int t = 2 * (_r + 1);
                 int c = Math.Max(1, (int)Math.Ceiling(8 * (double)(b / u)));
-                int i, j, k;
 
-                //Things that have to be UInt64
-                UInt64 A, B;
-                UInt64[] L = new UInt64[c];
 
                 // Key scheduling
                 for (i = b - 1, L[c - 1] = 0; i != -1; i--)
@@ -193,42 +177,36 @@ The Decode() method is nothing more than the reverse of the Encode() method, hen
 
 ```c#
 public override string Encode(string plain)
-            {
-                //adjusting the length of the ciphertext
-                var bs = 16;
-                if (plain.Length % bs != 0)
-                {
-                    var add = (bs - plain.Length % bs);
-                    plain += new String('\0', add);
-                }
-                // Ecnoding the blocks
-                var byteString = Encoding.ASCII.GetBytes(plain);
-                var encodedString = new byte[byteString.Length];
-                var strlen = byteString.Length;
-                for (int i = 0; i < strlen; i += bs)
-                {
+{
+    //adjusting the length of the ciphertext with '\0' padding
+    if (plain.Length % _blocksize != 0)
+    {
+        var add = (_blocksize - plain.Length % _blocksize);
+        plain += new String('\0', add);
+    }
+    // Ecnoding the blocks
+    var byteString = Encoding.ASCII.GetBytes(plain);
+    var strlen = byteString.Length;
+    for (int i = 0; i < strlen; i += _blocksize)
+    {
+        encodeBlock(byteString[i..(i + _blocksize)]).CopyTo(encodedString, i);
+    }
+return Convert.ToHexString(encodedString);
+}
 
-                    encodeBlock(byteString[i..(i + bs)]).CopyTo(encodedString, i);
-                }
-                return Convert.ToHexString(encodedString);
-            }
 
-            public override string Decode(string cipher)
-            {
-                //getting bytes from the string
-                var bytes = Convert.FromHexString(cipher);
-                var strlen = bytes.Length;
-                var bs = 16;
-                var decodedString = new byte[strlen];
-                for (int i = 0; i < strlen; i += bs)
-                {
-
-                    decodeBlock(bytes[i..(i + bs)]).CopyTo(decodedString, i);
-                }
-                var cleaning = Array.IndexOf<byte>(decodedString, 0);
-                Array.Resize<byte>(ref decodedString, cleaning);
-                return Encoding.ASCII.GetString(decodedString);
-            }
+public override string Decode(string cipher)
+{
+//getting bytes from the string
+var bytes = Convert.FromHexString(cipher);
+for (int i = 0; i < bytelen; i += _blocksize)
+{
+decodeBlock(bytes[i..(i + _blocksize)]).CopyTo(decodedString, i);
+}
+var cleaning = Array.IndexOf<byte>(decodedString, 0);
+Array.Resize<byte>(ref decodedString, cleaning);
+return Encoding.ASCII.GetString(decodedString);
+}
 
 ```
 
