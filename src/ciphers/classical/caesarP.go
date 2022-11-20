@@ -11,7 +11,7 @@ type CaesarWithPermutation struct {
 }
 
 func (cp CaesarWithPermutation) GetType() string {
-	return cp.cipher.GetType() + "with permutation"
+	return cp.cipher.GetType() + " with permutation"
 }
 
 func (cp CaesarWithPermutation) Encode(plain string) string {
