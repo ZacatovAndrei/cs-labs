@@ -1,4 +1,4 @@
-package modern
+package symmetric
 
 import "encoding/hex"
 

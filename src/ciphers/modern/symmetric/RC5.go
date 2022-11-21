@@ -1,10 +1,12 @@
-package modern
+package symmetric
 
 import (
 	"encoding/binary"
 	"encoding/hex"
+	"fmt"
 	"math"
 	"math/bits"
+	"strings"
 )
 
 type RC5 struct {
@@ -19,8 +21,8 @@ func NewRC5(key string, rounds int) *RC5 {
 	S := make([]uint64, 2*(rounds+1))
 	ret := RC5{
 		key,
-		64,
-		4,
+		8,
+		16,
 		rounds,
 		S,
 	}
@@ -34,15 +36,32 @@ func (R RC5) GetType() string {
 }
 
 func (R RC5) Encode(plain string) string {
-	for
-	blockRet := R.encodeBlock([]byte(plain))
-	return hex.EncodeToString(blockRet)
+	var msg []byte
+	msgLen := len(plain)
+	if msgLen%(R.wordWidth*2) != 0 {
+		padLen := R.wordWidth*2 - msgLen%(R.wordWidth*2)
+		plain += strings.Repeat("\000", padLen)
+		msgLen += padLen
+		msg = []byte(plain)
+	}
+	ret := make([]byte, msgLen)
+	fmt.Println(plain)
+	for i := 0; i < msgLen; i += R.blockSize {
+		blockRet := R.encodeBlock(msg[i : i+R.blockSize])
+		copy(ret[i:i+R.blockSize], blockRet)
+	}
+	return hex.EncodeToString(ret)
 }
 
 func (R RC5) Decode(cipher string) string {
-	a, _ := hex.DecodeString(cipher)
-	blockRet := R.decodeBlock(a)
-	return string(blockRet)
+	msg, _ := hex.DecodeString(cipher)
+	msgLen := len(msg)
+	ret := make([]byte, msgLen)
+	for i := 0; i < msgLen; i += R.blockSize {
+		blockRet := R.decodeBlock(msg[i : i+R.blockSize])
+		copy(ret[i:i+R.blockSize], blockRet)
+	}
+	return string(ret)
 }
 
 func (R RC5) scheduleKey(keyBytes []byte) {
@@ -53,7 +72,7 @@ func (R RC5) scheduleKey(keyBytes []byte) {
 
 	var (
 		b = len(keyBytes)
-		u = R.wordWidth / 8
+		u = R.wordWidth
 		t = 2 * (R.rounds + 1)
 		c = int(math.Max(math.Ceil(8*float64(b)/float64(u)), 1))
 		A = uint64(0)

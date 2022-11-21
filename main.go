@@ -3,7 +3,8 @@ package main
 import (
 	"cs-labs/src/ciphers"
 	"cs-labs/src/ciphers/classical"
-	"cs-labs/src/ciphers/modern"
+	"cs-labs/src/ciphers/modern/asymmetric"
+	"cs-labs/src/ciphers/modern/symmetric"
 	"fmt"
 )
 
@@ -31,14 +32,13 @@ func main() {
 	ciphersImplemented = append(ciphersImplemented,
 		classical.NewVigenere(EngAlph, "Attack"))
 	ciphersImplemented = append(ciphersImplemented,
-		modern.NewRC4("Some random key of a decent length"))
+		symmetric.NewRC4("Some random key of a decent length"))
 	ciphersImplemented = append(ciphersImplemented,
-		modern.NewRC5("hello there i hate it here", 12))
-	// ciphersImplemented = append(ciphersImplemented,)
-	// ciphersImplemented = append(ciphersImplemented,)
+		symmetric.NewRC5("hello there i hate it here", 12))
+	ciphersImplemented = append(ciphersImplemented, asymmetric.NewRSA())
+
 	for _, cipher := range ciphersImplemented {
 		encoded := cipher.Encode(Msg)
 		fmt.Printf("Current cipher: %v\nEncoded message: %v\nDecoded message: %v\n\n", cipher.GetType(), encoded, cipher.Decode(encoded))
 	}
-
 }
