@@ -15,8 +15,7 @@ const (
 
 func init() {
 	fmt.Printf("This is a sample driver program to Show the results of the CS laboratory works\n")
-	fmt.Printf("Author:\nGroup:\n")
-	fmt.Println(3*float64(8)/float64(5), "oof")
+	fmt.Printf("Author:Zacatov Andrei\nGroup:FAF-201\n")
 	fmt.Printf("Test message is: %v\n\n", Msg)
 }
 

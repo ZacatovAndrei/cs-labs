@@ -1,7 +1,6 @@
 package classical
 
 import (
-	"fmt"
 	"strings"
 )
 
@@ -49,6 +48,5 @@ func permuteAlphabet(alphabet string, permutation string) string {
 			res.WriteRune(char)
 		}
 	}
-	fmt.Println(res.String())
 	return res.String()
 }

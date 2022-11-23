@@ -5,12 +5,13 @@ import (
 	"crypto/rsa"
 	"encoding/hex"
 	"errors"
+	"log"
 	"math/big"
 )
 
 type RSA struct {
 	privateKey *big.Int
-	publicKey  *big.Int
+	PublicKey  *big.Int
 	modulus    *big.Int
 }
 
@@ -19,9 +20,10 @@ func NewRSA() *RSA {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("Generating RSA Keypair\n\nModulus: %v\nPublic key: %v\n\n", key.N.String(), key.E)
 	return &RSA{
 		privateKey: key.D,
-		publicKey:  big.NewInt(int64(key.E)),
+		PublicKey:  big.NewInt(int64(key.E)),
 		modulus:    key.N,
 	}
 }
@@ -36,7 +38,7 @@ func (R RSA) Encode(plain string) string {
 	}
 	msg := big.NewInt(0)
 	msg.SetBytes([]byte(plain))
-	return hex.EncodeToString(msg.Exp(msg, R.publicKey, R.modulus).Bytes())
+	return hex.EncodeToString(msg.Exp(msg, R.PublicKey, R.modulus).Bytes())
 }
 
 func (R RSA) Decode(cipher string) string {
