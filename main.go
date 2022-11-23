@@ -1,10 +1,12 @@
 package main
 
 import (
+	"crypto/sha1"
 	"cs-labs/src/ciphers"
 	"cs-labs/src/ciphers/classical"
 	"cs-labs/src/ciphers/modern/asymmetric"
 	"cs-labs/src/ciphers/modern/symmetric"
+	"cs-labs/src/signature"
 	"fmt"
 )
 
@@ -35,9 +37,19 @@ func main() {
 	ciphersImplemented = append(ciphersImplemented,
 		symmetric.NewRC5("hello there i hate it here", 12))
 	ciphersImplemented = append(ciphersImplemented, asymmetric.NewRSA())
-
+	// Loop that encodes the messasge and then decodes it
 	for _, cipher := range ciphersImplemented {
 		encoded := cipher.Encode(Msg)
 		fmt.Printf("Current cipher: %v\nEncoded message: %v\nDecoded message: %v\n\n", cipher.GetType(), encoded, cipher.Decode(encoded))
 	}
+	// The digital signature part
+	testSign := signature.NewSignature(sha1.New())
+	digiSign, digest := testSign.Sign(Msg)
+	fmt.Printf("Digital signature:\n%v\n\n", digiSign)
+	if testSign.Verify(digiSign, digest, testSign.PbKey, testSign.Mod) {
+		fmt.Println("Signature verified and valid")
+	} else {
+		fmt.Println("Signature verified and invalid")
+	}
+
 }

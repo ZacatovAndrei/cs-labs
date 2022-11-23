@@ -12,7 +12,7 @@ import (
 type RSA struct {
 	privateKey *big.Int
 	PublicKey  *big.Int
-	modulus    *big.Int
+	Modulus    *big.Int
 }
 
 func NewRSA() *RSA {
@@ -24,7 +24,7 @@ func NewRSA() *RSA {
 	return &RSA{
 		privateKey: key.D,
 		PublicKey:  big.NewInt(int64(key.E)),
-		modulus:    key.N,
+		Modulus:    key.N,
 	}
 }
 
@@ -38,7 +38,7 @@ func (R RSA) Encode(plain string) string {
 	}
 	msg := big.NewInt(0)
 	msg.SetBytes([]byte(plain))
-	return hex.EncodeToString(msg.Exp(msg, R.PublicKey, R.modulus).Bytes())
+	return msg.Exp(msg, R.PublicKey, R.Modulus).Text(16)
 }
 
 func (R RSA) Decode(cipher string) string {
@@ -46,7 +46,10 @@ func (R RSA) Decode(cipher string) string {
 	if err != nil {
 		panic(err)
 	}
+	if len(dCipher) > (2048 / 8) {
+		panic("value too big to decode")
+	}
 	msg := big.NewInt(0)
 	msg.SetBytes(dCipher)
-	return string(msg.Exp(msg, R.privateKey, R.modulus).Bytes())
+	return string(msg.Exp(msg, R.privateKey, R.Modulus).Bytes())
 }
