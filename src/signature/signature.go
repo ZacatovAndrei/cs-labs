@@ -45,9 +45,7 @@ func (s Signature) Verify(message string, original string, publicKey *big.Int, m
 
 	origMsg := big.NewInt(0)
 	origMsg.SetString(original, 16)
-
 	res := msgNum.Exp(msgNum, publicKey, modulus)
-
 	fmt.Println(res)
 	fmt.Println(origMsg)
 	if res.Cmp(origMsg) != 0 {
