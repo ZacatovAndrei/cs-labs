@@ -35,17 +35,17 @@ func (R RC5) GetType() string {
 	return "RC5 symmetric block Cipher"
 }
 
-func (R RC5) Encode(plain string) string {
+func (R RC5) Encode(plainText string) string {
 	var msg []byte
-	msgLen := len(plain)
+	msgLen := len(plainText)
 	if msgLen%(R.wordWidth*2) != 0 {
 		padLen := R.wordWidth*2 - msgLen%(R.wordWidth*2)
-		plain += strings.Repeat("\000", padLen)
+		plainText += strings.Repeat("\000", padLen)
 		msgLen += padLen
-		msg = []byte(plain)
+		msg = []byte(plainText)
 	}
 	ret := make([]byte, msgLen)
-	fmt.Println(plain)
+	fmt.Println(plainText)
 	for i := 0; i < msgLen; i += R.blockSize {
 		blockRet := R.encodeBlock(msg[i : i+R.blockSize])
 		copy(ret[i:i+R.blockSize], blockRet)
@@ -53,8 +53,8 @@ func (R RC5) Encode(plain string) string {
 	return hex.EncodeToString(ret)
 }
 
-func (R RC5) Decode(cipher string) string {
-	msg, _ := hex.DecodeString(cipher)
+func (R RC5) Decode(cipherText string) string {
+	msg, _ := hex.DecodeString(cipherText)
 	msgLen := len(msg)
 	ret := make([]byte, msgLen)
 	for i := 0; i < msgLen; i += R.blockSize {

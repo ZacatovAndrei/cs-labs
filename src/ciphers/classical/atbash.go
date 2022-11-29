@@ -13,13 +13,13 @@ func NewAtbash(alphabet string) *Atbash {
 	return &Atbash{alphabet: alphabet}
 }
 
-func (A Atbash) Encode(plain string) string {
+func (A Atbash) Encode(plainText string) string {
 	// setup
-	plain = strings.ToUpper(plain)
+	plainText = strings.ToUpper(plainText)
 	var res strings.Builder
 	var newIndex int
 	//Encryption
-	for _, char := range plain {
+	for _, char := range plainText {
 		if !unicode.IsLetter(char) {
 			res.WriteRune(char)
 			continue
@@ -31,8 +31,8 @@ func (A Atbash) Encode(plain string) string {
 	return res.String()
 }
 
-func (A Atbash) Decode(cipher string) string {
-	res := A.Encode(cipher)
+func (A Atbash) Decode(cipherText string) string {
+	res := A.Encode(cipherText)
 	res = strings.ToLower(res)
 	return res
 }

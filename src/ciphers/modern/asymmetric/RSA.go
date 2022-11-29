@@ -32,17 +32,17 @@ func (R RSA) GetType() string {
 	return "RSA asymmetrical cipher"
 }
 
-func (R RSA) Encode(plain string) string {
-	if len(plain) > (2048 / 8) {
+func (R RSA) Encode(plainText string) string {
+	if len(plainText) > (2048 / 8) {
 		panic(errors.New("text too long to encode"))
 	}
 	msg := big.NewInt(0)
-	msg.SetBytes([]byte(plain))
+	msg.SetBytes([]byte(plainText))
 	return msg.Exp(msg, R.PublicKey, R.Modulus).Text(16)
 }
 
-func (R RSA) Decode(cipher string) string {
-	dCipher, err := hex.DecodeString(cipher)
+func (R RSA) Decode(cipherText string) string {
+	dCipher, err := hex.DecodeString(cipherText)
 	if err != nil {
 		panic(err)
 	}

@@ -2,6 +2,6 @@ package ciphers
 
 type Cipher interface {
 	GetType() string
-	Encode(plain string) string
-	Decode(cipher string) string
+	Encode(plainText string) string
+	Decode(cipherText string) string
 }

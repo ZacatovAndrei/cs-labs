@@ -25,9 +25,9 @@ func (R RC4) GetType() string {
 	return "RC4, a symmetric stream cipher"
 }
 
-func (R RC4) Encode(plain string) string {
-	msg := []byte(plain)
-	msgLen := len(plain)
+func (R RC4) Encode(plainText string) string {
+	msg := []byte(plainText)
+	msgLen := len(plainText)
 	keyBytes := R.getKeyStreamBytes(msgLen)
 	res := make([]byte, msgLen)
 	for i := 0; i < msgLen; i++ {
@@ -36,9 +36,9 @@ func (R RC4) Encode(plain string) string {
 	return hex.EncodeToString(res)
 }
 
-func (R RC4) Decode(cipher string) string {
+func (R RC4) Decode(cipherText string) string {
 	R.scheduleKey([]byte(R.key))
-	msg, ok := hex.DecodeString(cipher)
+	msg, ok := hex.DecodeString(cipherText)
 	if ok != nil {
 		panic(ok)
 	}

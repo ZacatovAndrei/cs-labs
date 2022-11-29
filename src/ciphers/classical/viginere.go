@@ -14,15 +14,15 @@ func (v Vigenere) GetType() string {
 	return "Vigenere Cipher"
 }
 
-func (v Vigenere) Encode(plain string) string {
-	plain = strings.ToUpper(plain)
+func (v Vigenere) Encode(plainText string) string {
+	plainText = strings.ToUpper(plainText)
 	var (
 		keyPos   = 0
 		newIndex = 0
 		res      strings.Builder
 	)
 	//Encryption
-	for _, char := range plain {
+	for _, char := range plainText {
 		if !unicode.IsLetter(char) {
 			res.WriteRune(char)
 			continue
@@ -36,14 +36,14 @@ func (v Vigenere) Encode(plain string) string {
 
 }
 
-func (v Vigenere) Decode(cipher string) string {
+func (v Vigenere) Decode(cipherText string) string {
 	var (
 		keyPos   = 0
 		newIndex = 0
 		res      strings.Builder
 	)
 	//Encryption
-	for _, char := range cipher {
+	for _, char := range cipherText {
 		if !unicode.IsLetter(char) {
 			res.WriteRune(char)
 			continue

@@ -13,12 +13,12 @@ func (cp CaesarWithPermutation) GetType() string {
 	return cp.cipher.GetType() + " with permutation"
 }
 
-func (cp CaesarWithPermutation) Encode(plain string) string {
-	return cp.cipher.Encode(plain)
+func (cp CaesarWithPermutation) Encode(plainText string) string {
+	return cp.cipher.Encode(plainText)
 }
 
-func (cp CaesarWithPermutation) Decode(cipher string) string {
-	return cp.cipher.Decode(cipher)
+func (cp CaesarWithPermutation) Decode(cipherText string) string {
+	return cp.cipher.Decode(cipherText)
 }
 
 func NewCaesarWithPermutation(alphabet string, key string, permutation string) *CaesarWithPermutation {
