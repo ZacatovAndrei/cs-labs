@@ -9,6 +9,7 @@
 ### Theory
 
 Public-key cryptography (also called asymmetric) is a field of cryptography that uses two different keys for encryption
+
 - a keypair. Each pair consists of a private key that is kept secret, and a public key that is exchanged.
 In such ciphers (called asymmetrical ciphers) everyone can encode the message with the provided public key, but only the
 owner of the private key will be able to decrypt it.
@@ -26,15 +27,15 @@ RSA is used to transmit shared keys for symmetric-key cryptography, which are th
 
 ### Objectives
 
-* Implement RSA encryption and decryption
+- Implement RSA encryption and decryption
 
 ### Implementation description
 
-* Since the encryption process is a modular exponentiation problem the standard library of the Go programming language
+- Since the encryption process is a modular exponentiation problem the standard library of the Go programming language
   can be used.
   At the same time key generation of a decent length is also a problem, hence the standard library has been used again
 
-* Key generation
+- Key generation
 
 ```go
 key, err := rsa.GenerateKey(rand.Reader, 2048)
@@ -43,7 +44,7 @@ panic(err)
 }
 ```
 
-* Encryption implementation details:
+- Encryption implementation details:
 
 1. since the cipher uses modular arithmetic it is impossible to decrypt the messages that are longer than the key
    without losing information.
@@ -63,7 +64,7 @@ return hex.EncodeToString(msg.Exp(msg, R.publicKey, R.modulus).Bytes())
 }
 ```
 
-* Decryption implementation details:
+- Decryption implementation details:
   the return value is cast to a string because of the constriction of the Cipher interface, defining return type of the
   function to be `string`
 
