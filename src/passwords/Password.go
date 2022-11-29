@@ -25,6 +25,7 @@ func (u *UserDB) RegisterUser(userName string, password string) {
 func (u *UserDB) Authenticate(username string, password string) bool {
 	u.hashFunc.Write([]byte(password))
 	hashedPassword := hex.EncodeToString(u.hashFunc.Sum(nil))
+	u.hashFunc.Reset()
 	originalPassword, ok := u.credentials[username]
 	if !ok || hashedPassword != originalPassword {
 		fmt.Println("Error: Incorrect username or password")
