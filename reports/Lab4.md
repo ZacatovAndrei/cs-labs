@@ -110,25 +110,31 @@ A hash function is a one-way function that can map arbitrarily-sized data to a f
       ```
 
    2. The Authenticate method that returns a boolean `true` if the authentication was successful and `false` otherwise
-
-     ```go
-      func (u *UserDB) Authenticate(username string, password string) bool {
-         u.hashFunc.Write([]byte(password))
-         hashedPassword := hex.EncodeToString(u.hashFunc.Sum(nil))
-         u.hashFunc.Reset()
-         originalPassword, ok := u.credentials[username]
-         if !ok || hashedPassword != originalPassword {
-            fmt.Println("Error: Incorrect username or password")
-            return false
-         }
-         if hashedPassword == originalPassword {
-            fmt.Println("User successfully authenticated")
-            return true
-         }
-         return false
-      }
-
-     ```
+         ```go
+          func (u *UserDB) Authenticate(username string, password string) bool {
+             u.hashFunc.Write([]byte(password))
+             hashedPassword := hex.EncodeToString(u.hashFunc.Sum(nil))
+             u.hashFunc.Reset()
+             originalPassword, ok := u.credentials[username]
+             if !ok || hashedPassword != originalPassword {
+                fmt.Println("Error: Incorrect username or password")
+                return false
+             }
+             if hashedPassword == originalPassword {
+                fmt.Println("User successfully authenticated")
+                return true
+             }
+             return false
+          }
+         ```
+   3. The DeleteUser method that "deletes" a user from the database.The intention is to handle the whole verification part on the "frontend" side when user has already been authenticated and such, hence only the username will be needed.  
+   For now, it mostly just deletes the entry from the map.
+        ```go
+            func (u *UserDB) RemoveUser(username string) {
+            delete(u.credentials, username)
+            }
+        ```
+   
 
 3. Technically it would need a `Delete` method, however since it's an in-memory example there is no use for it in this context.`
 

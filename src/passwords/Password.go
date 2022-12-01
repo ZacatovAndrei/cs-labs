@@ -37,3 +37,7 @@ func (u *UserDB) Authenticate(username string, password string) bool {
 	}
 	return false
 }
+
+func (u *UserDB) RemoveUser(username string) {
+	delete(u.credentials, username)
+}
